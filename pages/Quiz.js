@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button, Animated, Pressable, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Button, Animated, Pressable, ActivityIndicator, ImageBackground } from 'react-native';
     
 export default class Quiz extends Component {
 
@@ -16,26 +16,37 @@ export default class Quiz extends Component {
     render() {
         return(
             <View style={styles.container}>
-                <View style={styles.title}>
-                    <Text style={styles.titleText}>
-                        Quiz
-                    </Text>
-                </View>
-                <View style={styles.info_container}>
-                    <Text style={styles.funFact}>Question</Text>
-                    <View style={styles.button}>
-                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 1</Text>
+                <ImageBackground 
+                    source={require('../assets/home/clean_pile.png')}
+                    style={{
+                        width: '100%',
+                        height: '100%'
+                    }}
+                >
+                    <View style={styles.title}>
+                        <Text style={styles.titleText}>
+                            Quiz
+                        </Text>
                     </View>
-                    <View style={styles.button}>
-                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 2</Text>
+                    <View style={styles.info_container}>
+                        <Text style={styles.funFact}>Question</Text>
+                        <View style={styles.button}>
+                            <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 1</Text>
+                        </View>
+                        <View style={styles.button}>
+                            <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 2</Text>
+                        </View>
+                        <View style={styles.button}>
+                            <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 3</Text>
+                        </View>
+                        <View style={styles.button}>
+                            <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 4</Text>
+                        </View>
+                        <Pressable style={styles.goBack} onPress={() => this.props.navigation.navigate("GameOver")}>
+                            <Text style={{textAlign: 'center', color: 'white', fontWeight: 'bold'}}>Go Back</Text>
+                        </Pressable>
                     </View>
-                    <View style={styles.button}>
-                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 3</Text>
-                    </View>
-                    <View style={styles.button}>
-                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>Answer 4</Text>
-                    </View>
-                </View>
+                </ImageBackground>
             </View>
         )
     }
@@ -61,6 +72,16 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         marginRight: 'auto',
         marginTop: 10,
+        borderRadius: 20
+    },
+    goBack: {
+        width: 200,
+        backgroundColor: "#5E5DF0",
+        padding: 10,
+        color: '#445463',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginTop: 30,
         borderRadius: 20
     },
     info_container: {

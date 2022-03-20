@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Button, Animated, Pressable, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Button, Animated, Pressable, ActivityIndicator, ImageBackground } from 'react-native';
     
 export default class GameOver extends Component {
 
@@ -36,28 +36,44 @@ export default class GameOver extends Component {
     render() {
         return(
             <View style={styles.container}>
-                <View style={styles.title}>
-                    <Text style={styles.titleText}>
-                        Game Over
-                    </Text>
-                </View>
-                <View style={styles.info_container}>
-                    <Text style={styles.funFact}>Fun Fact</Text>
-                    {this.state.question === "" ?
-                        <ActivityIndicator size="large" />
-                        :
-                        <Text style={styles.questionText}>{this.state.question}</Text>
-                    }
-                    <Pressable style={styles.button} onPress={() => this.props.navigation.navigate("Quiz")}>
-                        <Text style={{color: 'white', textAlign: 'center'}}>Take Quiz</Text>
-                    </Pressable>
-                    <View>
-                        <Text style={{textAlign: 'center'}}>or</Text>
+                <ImageBackground
+                    source={require('../assets/home/clean_pile.png')}
+                    style={{
+                        width: '100%',
+                        height: '100%'
+                    }}
+                >
+                    <View style={styles.title}>
+                        <Text style={styles.titleText}>
+                            Game Over
+                        </Text>
                     </View>
-                    <Pressable style={styles.button} onPress={() => this.props.navigation.navigate("Recycling")}>
-                        <Text style={{color: 'white', textAlign: 'center'}}>Start Over</Text>
-                    </Pressable>
-                </View>
+                    <View style={styles.info_container}>
+                        <Text style={styles.funFact}>Sustainability Fact</Text>
+                        {this.state.question === "" ?
+                            <ActivityIndicator size="large" />
+                            :
+                            <Text style={styles.questionText}>{this.state.question}</Text>
+                        }
+                        <View style={{
+                            marginTop: 100
+                        }}>
+                            <Text style={{
+                                textAlign: 'center',
+                                fontWeight: 'bold'
+                            }}>Take a quiz to test your sustainability knowledge!</Text>
+                        </View>
+                        <Pressable style={styles.button} onPress={() => this.props.navigation.navigate("Quiz")}>
+                            <Text style={{color: 'white', textAlign: 'center'}}>Take Quiz</Text>
+                        </Pressable>
+                        <View>
+                            <Text style={{textAlign: 'center'}}>or</Text>
+                        </View>
+                        <Pressable style={styles.button} onPress={() => this.props.navigation.navigate("Recycling")}>
+                            <Text style={{color: 'white', textAlign: 'center'}}>Start Over</Text>
+                        </Pressable>
+                    </View>
+                </ImageBackground>
             </View>
         )
     }

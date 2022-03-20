@@ -30,7 +30,7 @@ const {width, height} = Dimensions.get("screen");
 
 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
 
-const randomPosition = Math.floor(Math.random() * width);
+const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
 
 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
 

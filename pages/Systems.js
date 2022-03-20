@@ -5,7 +5,7 @@ import { Trash } from "./Trash";
 const Physics = (entities, { time, dispatch }) => {
     let engine = entities["physics"].engine;
     let world = entities["physics"].world;
-    
+
     Matter.Engine.update(engine, time.delta);
 
     let score = entities.floor.score;
@@ -119,7 +119,7 @@ const deleteTrash = (entities, { time }) => {
     
                 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
         
-                const randomPosition = Math.floor(Math.random() * width);
+                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
         
                 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
         
@@ -184,7 +184,7 @@ const deleteTrash = (entities, { time }) => {
     
                 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
         
-                const randomPosition = Math.floor(Math.random() * width);
+                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
         
                 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
         
@@ -246,7 +246,7 @@ const deleteTrash = (entities, { time }) => {
     
                 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
         
-                const randomPosition = Math.floor(Math.random() * width);
+                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
         
                 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
         
@@ -311,7 +311,7 @@ const deleteTrash = (entities, { time }) => {
     
                 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
         
-                const randomPosition = Math.floor(Math.random() * width);
+                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
         
                 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
         
@@ -373,7 +373,7 @@ const deleteTrash = (entities, { time }) => {
     
                 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
         
-                const randomPosition = Math.floor(Math.random() * width);
+                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
         
                 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
         
@@ -435,7 +435,7 @@ const deleteTrash = (entities, { time }) => {
     
                 const boxSize = Math.trunc(Math.max(width, height) * 0.035);
         
-                const randomPosition = Math.floor(Math.random() * width);
+                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
         
                 const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
         
