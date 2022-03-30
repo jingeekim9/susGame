@@ -10,14 +10,15 @@ export default class GameOver extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            question: ""
+            question: "",
+            score: this.props.route.params.score
         }
         this.opacity = new Animated.Value(0);
     }
 
     componentDidMount() {
         this._isMounted = true;
-        axios.get('https://sus-game.herokuapp.com/')
+        axios.get('https://sus-game.herokuapp.com?type=1')
         .then((response) => {
             let data = response.data;
             let random = Math.floor(Math.random() * Object.keys(data['Questions']).length);
@@ -46,6 +47,9 @@ export default class GameOver extends Component {
                     <View style={styles.title}>
                         <Text style={styles.titleText}>
                             Game Over
+                        </Text>
+                        <Text style={styles.score}>
+                            Score: {this.state.score}
                         </Text>
                     </View>
                     <View style={styles.info_container}>
@@ -90,6 +94,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 40,
         fontWeight: 'bold'
+    },  
+    score: {
+        textAlign: 'center',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: 20
     },  
     button: {
         width: 100,

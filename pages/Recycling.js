@@ -54,7 +54,8 @@ export default class Recycling extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      gameRunning: true
+      gameRunning: true,
+      score: 0
     }
   }
 
@@ -102,7 +103,11 @@ export default class Recycling extends Component {
           switch (e) {
             case "game-over":
               this.setState({gameRunning: false})
-              this.props.navigation.navigate("GameOver")
+              this.props.navigation.navigate("GameOver", {score: this.state.score});
+              break;
+            
+            case "update_score":
+              this.setState({score: this.state.score + 1});
           }
         }}
       >

@@ -71,7 +71,7 @@ const MoveTrashCan = (entities, { touches }) => {
     return entities;
 }
 
-const deleteTrash = (entities, { time }) => {
+const deleteTrash = (entities, { time, dispatch }) => {
     let level = entities.floor.level;
     if(level == 1)
     {
@@ -93,6 +93,7 @@ const deleteTrash = (entities, { time }) => {
                         if(entities.trash)
                         {
                             entities.floor.score = entities.floor.score + 1;
+                            dispatch('update_score');
                         }
                         Matter.Composite.remove(world, trash);
                         delete entities.trash
@@ -158,6 +159,7 @@ const deleteTrash = (entities, { time }) => {
                         if(entities.trash1)
                         {
                             entities.floor.score = entities.floor.score + 1;
+                            dispatch('update_score');
                         }
                         Matter.Composite.remove(world, trash);
                         delete entities.trash1
@@ -220,6 +222,7 @@ const deleteTrash = (entities, { time }) => {
                         if(entities.trash2)
                         {
                             entities.floor.score = entities.floor.score + 1;
+                            dispatch('update_score');
                         }
                         Matter.Composite.remove(world, trash);
                         delete entities.trash2
@@ -285,6 +288,7 @@ const deleteTrash = (entities, { time }) => {
                         if(entities.trash1)
                         {
                             entities.floor.score = entities.floor.score + 1;
+                            dispatch('update_score');
                         }
                         Matter.Composite.remove(world, trash);
                         delete entities.trash1
@@ -347,6 +351,7 @@ const deleteTrash = (entities, { time }) => {
                         if(entities.trash2)
                         {
                             entities.floor.score = entities.floor.score + 1;
+                            dispatch('update_score');
                         }
                         Matter.Composite.remove(world, trash);
                         delete entities.trash2
@@ -409,6 +414,7 @@ const deleteTrash = (entities, { time }) => {
                         if(entities.trash3)
                         {
                             entities.floor.score = entities.floor.score + 1;
+                            dispatch('update_score');
                         }
                         Matter.Composite.remove(world, trash);
                         delete entities.trash3
