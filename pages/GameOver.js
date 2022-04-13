@@ -11,7 +11,8 @@ export default class GameOver extends Component {
         super(props);
         this.state = {
             question: "",
-            score: this.props.route.params.score
+            score: this.props.route.params.score,
+            preQuiz: this.props.route.params.preQuiz
         }
         this.opacity = new Animated.Value(0);
     }
@@ -67,7 +68,7 @@ export default class GameOver extends Component {
                                 fontWeight: 'bold'
                             }}>Take a quiz to test your sustainability knowledge!</Text>
                         </View>
-                        <Pressable style={styles.button} onPress={() => this.props.navigation.navigate("Quiz")}>
+                        <Pressable style={styles.button} onPress={() => this.props.navigation.navigate("Quiz", {preQuiz: this.state.preQuiz})}>
                             <Text style={{color: 'white', textAlign: 'center'}}>Take Quiz</Text>
                         </Pressable>
                         <View>

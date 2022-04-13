@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ImageBackground, ActivityIndicator, Pressable } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
 import Matter from "matter-js";
 import { Trash } from './Trash';
@@ -9,6 +9,8 @@ import { Background } from './Background';
 import { Physics, MoveTrashCan, deleteTrash } from "./Systems";
 import { TrashCan } from './TrashCan';
 import { useFocusEffect } from '@react-navigation/native';
+import Modal from 'react-native-modal';
+import axios from 'axios';
 
 function FetchUserData({ gameRunning, onUpdate }) {
   useFocusEffect(
@@ -51,16 +53,62 @@ Matter.World.add(world, [trash, trashCan, floor]);
 
 export default class Recycling extends Component {
 
+  _isMounted = false;
+  
   constructor(props) {
     super(props);
     this.state = {
       gameRunning: true,
-      score: 0
+      score: 0,
+      question: [],
+      level: 1,
+      preQuiz: this.props.route.params.preQuiz
     }
   }
 
+  componentDidMount() {
+    this._isMounted = true;
+    axios.get('https://sus-game.herokuapp.com?type=1')
+    .then((response) => {
+        let data = response.data;
+        let arr = [];
+        let questions = [];
+        while(questions.length < 5)
+        {
+          let random = Math.floor(Math.random() * Object.keys(data['Questions']).length);
+          if(arr.indexOf(random) === -1)
+          { 
+            questions.push(data['Questions'][String(random)]);
+            arr.push(random);
+          }
+        }
+
+        if(this._isMounted)
+        {
+            this.setState({question: questions})
+        }
+    })
+  }
+
   _handleUpdate = gameRunning => {
-    this.setState({gameRunning: gameRunning})
+    this.setState({gameRunning: gameRunning});
+    axios.get('https://sus-game.herokuapp.com?type=1')
+    .then((response) => {
+        let data = response.data;
+        let arr = [];
+        let questions = [];
+        while(questions.length < 5)
+        {
+          let random = Math.floor(Math.random() * Object.keys(data['Questions']).length);
+          if(arr.indexOf(random) === -1)
+          { 
+            questions.push(data['Questions'][String(random)]);
+            arr.push(random);
+          }
+        }
+
+        this.setState({question: questions})
+    })
   }
 
   render() {
@@ -103,11 +151,17 @@ export default class Recycling extends Component {
           switch (e) {
             case "game-over":
               this.setState({gameRunning: false})
-              this.props.navigation.navigate("GameOver", {score: this.state.score});
+              this.props.navigation.navigate("GameOver", {score: this.state.score, preQuiz: this.state.preQuiz});
+              this.setState({score: 0});
+              this.setState({level: 1});
               break;
             
             case "update_score":
               this.setState({score: this.state.score + 1});
+              break;
+            case "next_level":
+              this.setState({level: this.state.level + 1});
+              this.setState({gameRunning: false})
           }
         }}
       >
@@ -116,6 +170,24 @@ export default class Recycling extends Component {
           gameRunning={this.props.gameRunning}
           onUpdate={this._handleUpdate}
         />
+        <Modal isVisible={!this.state.gameRunning}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{backgroundColor: 'white', paddingVertical: 20, paddingHorizontal: 10, borderRadius: 10}}>
+              <Text style={styles.funFact}>Sustainability Fact</Text>
+              {
+                this.state.question.length == 0 ?
+                <ActivityIndicator size="large" />
+                :
+                <Text style={styles.questionText}>{this.state.question[this.state.level - 1]}</Text>
+              }
+                <Pressable style={styles.button} onPress={() => {
+                  this.setState({gameRunning: true});
+                }}>
+                    <Text style={{color: 'white', textAlign: 'center'}}>Play Next Level</Text>
+                </Pressable>
+            </View>
+          </View>
+        </Modal>
       </GameEngine>
     );
   }
@@ -130,5 +202,30 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain'
-  }
+  },  
+  button: {
+      width: 150,
+      backgroundColor: "#5E5DF0",
+      padding: 10,
+      color: 'white',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      marginTop: 30,
+      marginBottom: 30,
+      borderRadius: 20
+  },
+  funFact: {
+      textAlign: 'center',
+      fontSize: 30,
+      marginBottom: 30,
+      fontWeight: '800',
+      color: '#019267'
+  },
+  questionText: {
+      textAlign: 'center',
+      paddingLeft: 30,
+      paddingRight: 30,
+      fontSize: 20,
+      fontWeight: '700',
+  },
 });

@@ -5,7 +5,7 @@ import { StyleSheet, Text, View, Button, Animated, Pressable, ActivityIndicator,
 import Toast from "react-native-toast-message";
 import Modal from 'react-native-modal';
     
-export default class Quiz extends Component {
+export default class PreQuiz extends Component {
 
     _isMounted = false;
 
@@ -31,8 +31,7 @@ export default class Quiz extends Component {
             quesNum: 0,
             curQuestion: 0,
             showModal: false,
-            canPress: true,
-            preQuiz: this.props.route.params.preQuiz
+            canPress: true
         }
     }
 
@@ -193,7 +192,7 @@ export default class Quiz extends Component {
                                         <Text style={{textAlign: 'center', color: 'white', fontWeight: 'bold', fontSize: 20}}>Next Question</Text>
                                     </Pressable>
                                 }
-                                <Pressable style={styles.goBack} onPress={() => this.props.navigation.navigate("GameOver")}>
+                                <Pressable style={styles.goBack} onPress={() => this.props.navigation.navigate("Home")}>
                                     <Text style={{textAlign: 'center', color: 'white', fontWeight: 'bold'}}>Go Back</Text>
                                 </Pressable>
                             </View>
@@ -205,12 +204,11 @@ export default class Quiz extends Component {
                         <View style={{backgroundColor: 'white', paddingVertical: 20, paddingHorizontal: 10, borderRadius: 10}}>
                         <Text style={styles.funFact}>{this.state.right >= 3 ? "Good Job!" : "Do Better Next Time!"}</Text>
                             <Text style={styles.questionText}>You got {this.state.right} question(s) correct!</Text>
-                            <Text style={styles.subQuestionText}>You got {this.state.right - this.state.preQuiz} question(s) more correct than before playing the game!</Text>
                             <Pressable style={styles.goBack} onPress={() => {
                                 this.setState({showModal: false});
-                                this.props.navigation.navigate("GameOver");
+                                this.props.navigation.navigate("Recycling", {preQuiz: this.state.right});
                             }}>
-                                <Text style={{color: 'white', textAlign: 'center'}}>Go Back</Text>
+                                <Text style={{color: 'white', textAlign: 'center'}}>Play Game</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -274,13 +272,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: '700',
     },
-    subQuestionText: {
-        textAlign: 'center',
-        paddingLeft: 30,
-        paddingRight: 30,
-        fontSize: 13,
-        fontWeight: '700',
-    },
     funFact: {
         textAlign: 'center',
         fontSize: 30,
@@ -291,6 +282,6 @@ const styles = StyleSheet.create({
     curScore: {
         position: 'absolute',
         right: 50,
-        top: 30
+        top: 50
     }
 })

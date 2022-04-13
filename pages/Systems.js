@@ -12,17 +12,33 @@ const Physics = (entities, { time, dispatch }) => {
     let level = entities.floor.level;
     let life = entities.floor.life;
 
-    if(level == 1 && score == 16)
+    if(level == 1 && score == 10)
     {
         entities.floor.level = 2;
-        engine.world.gravity.y = 2;
-        entities.trashCan.type = "paper";
+        engine.world.gravity.y = 1.5;
+        entities.trashCan.type = "can";
+        dispatch('next_level');
     }
-    else if(level == 2 && score == 46)
+    else if(level == 2 && score == 20)
     {
         entities.floor.level = 3;
+        engine.world.gravity.y = 2;
+        entities.trashCan.type = "paper";
+        dispatch('next_level');
+    }
+    else if(level == 3 && score == 36)
+    {
+        entities.floor.level = 4;
         engine.world.gravity.y = 3;
+        entities.trashCan.type = "paper";
+        dispatch('next_level');
+    }
+    else if(level == 4 && score == 55)
+    {
+        entities.floor.level = 5;
+        engine.world.gravity.y = 5;
         entities.trashCan.type = "plastic";
+        dispatch('next_level');
     }
 
     if(life == 0)
@@ -31,6 +47,7 @@ const Physics = (entities, { time, dispatch }) => {
         entities.floor.level = 1;
         entities.floor.life = 3;
         engine.world.gravity.y = 1;
+        entities.trashCan.type = 'can';
         if(entities.trash)
         {
             Matter.Composite.remove(world, entities.trash.body);
@@ -72,393 +89,68 @@ const MoveTrashCan = (entities, { touches }) => {
 }
 
 const deleteTrash = (entities, { time, dispatch }) => {
-    let level = entities.floor.level;
-    if(level == 1)
+    if(entities.trash)
     {
-        if(entities.trash)
-        {
-            const trash = entities.trash.body;
-            const trashID = trash.id;
-            const trashCan = entities.trashCan.body;
-            const trashCanID = trashCan.id;
-            const floor = entities.floor.body;
-            const floorID = floor.id;
-            let engine = entities["physics"].engine;
-            let world = entities["physics"].world;
-            Matter.Events.on(engine, 'collisionStart', (event) => {
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
+        const trash = entities.trash.body;
+        const trashID = trash.id;
+        const trashCan = entities.trashCan.body;
+        const trashCanID = trashCan.id;
+        const floor = entities.floor.body;
+        const floorID = floor.id;
+        let engine = entities["physics"].engine;
+        let world = entities["physics"].world;
+        Matter.Events.on(engine, 'collisionStart', (event) => {
+            if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
+            {
+                if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
                 {
-                    if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
+                    if(entities.trash)
                     {
-                        if(entities.trash)
-                        {
-                            entities.floor.score = entities.floor.score + 1;
-                            dispatch('update_score');
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash
+                        entities.floor.score = entities.floor.score + 1;
+                        dispatch('update_score');
                     }
+                    Matter.Composite.remove(world, trash);
+                    delete entities.trash
                 }
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
+            }
+            if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
+            {
+                if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
                 {
-                    if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
+                    if(entities.trash)
                     {
-                        if(entities.trash)
-                        {
-                            entities.floor.life = entities.floor.life - 1;
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash
+                        entities.floor.life = entities.floor.life - 1;
                     }
+                    Matter.Composite.remove(world, trash);
+                    delete entities.trash
                 }
-            });
-        }
-        else
-        {
-            
-                const {width, height} = Dimensions.get("screen");
-    
-                const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-        
-                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
-        
-                const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
-        
-                let world = entities["physics"].world;
-
-                let type = Math.floor(Math.random() * 3);
-        
-                Matter.World.add(world, [trash]);
-                entities['trash'] = {
-                    body: trash,
-                    size: [boxSize, boxSize],
-                    trash: 'can',
-                    type: type,
-                    renderer: Trash
-                }
-
-        }
+            }
+        });
     }
-    else if(level == 2)
+    else
     {
-        if(entities.trash1)
-        {
-            const trash = entities.trash1.body;
-            const trashID = trash.id;
-            const trashCan = entities.trashCan.body;
-            const trashCanID = trashCan.id;
-            const floor = entities.floor.body;
-            const floorID = floor.id;
-            let engine = entities["physics"].engine;
-            let world = entities["physics"].world;
-            Matter.Events.on(engine, 'collisionStart', (event) => {
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
-                    {
-                        if(entities.trash1)
-                        {
-                            entities.floor.score = entities.floor.score + 1;
-                            dispatch('update_score');
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash1
-                    }
-                }
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
-                    {
-                        if(entities.trash1)
-                        {
-                            entities.floor.life = entities.floor.life - 1;
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash1
-                    }
-                }
-            });
-        }
-        else
-        {
-            
-                const {width, height} = Dimensions.get("screen");
+        
+            const {width, height} = Dimensions.get("screen");
+
+            const boxSize = Math.trunc(Math.max(width, height) * 0.035);
     
-                const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-        
-                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
-        
-                const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
-        
-                let world = entities["physics"].world;
-
-                let type = Math.floor(Math.random() * 3);
-        
-                Matter.World.add(world, [trash]);
-                entities['trash1'] = {
-                    body: trash,
-                    size: [boxSize, boxSize],
-                    trash: 'paper',
-                    type: type,
-                    renderer: Trash
-                }
-
-        }
-        if(entities.trash2)
-        {
-            const trash = entities.trash2.body;
-            const trashID = trash.id;
-            const trashCan = entities.trashCan.body;
-            const trashCanID = trashCan.id;
-            const floor = entities.floor.body;
-            const floorID = floor.id;
-            let engine = entities["physics"].engine;
-            let world = entities["physics"].world;
-            Matter.Events.on(engine, 'collisionStart', (event) => {
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
-                    {
-                        if(entities.trash2)
-                        {
-                            entities.floor.score = entities.floor.score + 1;
-                            dispatch('update_score');
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash2
-                    }
-                }
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
-                    {
-                        if(entities.trash2)
-                        {
-                            entities.floor.life = entities.floor.life - 1;
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash2
-                    }
-                }
-            });
-        }
-        else
-        {
-            
-                const {width, height} = Dimensions.get("screen");
+            const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
     
-                const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-        
-                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
-        
-                const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
-        
-                let world = entities["physics"].world;
-
-                let type = Math.floor(Math.random() * 3);
-        
-                Matter.World.add(world, [trash]);
-                entities['trash2'] = {
-                    body: trash,
-                    size: [boxSize, boxSize],
-                    trash: 'paper',
-                    type: type,
-                    renderer: Trash
-                }
-
-        }
-    }
-    else if(level == 3)
-    {
-        if(entities.trash1)
-        {
-            const trash = entities.trash1.body;
-            const trashID = trash.id;
-            const trashCan = entities.trashCan.body;
-            const trashCanID = trashCan.id;
-            const floor = entities.floor.body;
-            const floorID = floor.id;
-            let engine = entities["physics"].engine;
-            let world = entities["physics"].world;
-            Matter.Events.on(engine, 'collisionStart', (event) => {
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
-                    {
-                        if(entities.trash1)
-                        {
-                            entities.floor.score = entities.floor.score + 1;
-                            dispatch('update_score');
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash1
-                    }
-                }
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
-                    {
-                        if(entities.trash1)
-                        {
-                            entities.floor.life = entities.floor.life - 1;
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash1
-                    }
-                }
-            });
-        }
-        else
-        {
-            
-                const {width, height} = Dimensions.get("screen");
+            const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
     
-                const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-        
-                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
-        
-                const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
-        
-                let world = entities["physics"].world;
-
-                let type = Math.floor(Math.random() * 3);
-        
-                Matter.World.add(world, [trash]);
-                entities['trash1'] = {
-                    body: trash,
-                    size: [boxSize, boxSize],
-                    trash: 'plastic',
-                    type: type,
-                    renderer: Trash
-                }
-
-        }
-        if(entities.trash2)
-        {
-            const trash = entities.trash2.body;
-            const trashID = trash.id;
-            const trashCan = entities.trashCan.body;
-            const trashCanID = trashCan.id;
-            const floor = entities.floor.body;
-            const floorID = floor.id;
-            let engine = entities["physics"].engine;
             let world = entities["physics"].world;
-            Matter.Events.on(engine, 'collisionStart', (event) => {
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
-                    {
-                        if(entities.trash2)
-                        {
-                            entities.floor.score = entities.floor.score + 1;
-                            dispatch('update_score');
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash2
-                    }
-                }
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
-                    {
-                        if(entities.trash2)
-                        {
-                            entities.floor.life = entities.floor.life - 1;
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash2
-                    }
-                }
-            });
-        }
-        else
-        {
-            
-                const {width, height} = Dimensions.get("screen");
+
+            let type = Math.floor(Math.random() * 3);
     
-                const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-        
-                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
-        
-                const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
-        
-                let world = entities["physics"].world;
+            Matter.World.add(world, [trash]);
+            entities['trash'] = {
+                body: trash,
+                size: [boxSize, boxSize],
+                trash: entities.trashCan.type,
+                type: type,
+                renderer: Trash
+            }
 
-                let type = Math.floor(Math.random() * 3);
-        
-                Matter.World.add(world, [trash]);
-                entities['trash2'] = {
-                    body: trash,
-                    size: [boxSize, boxSize],
-                    trash: 'plastic',
-                    type: type,
-                    renderer: Trash
-                }
-
-        } 
-        if(entities.trash3)
-        {
-            const trash = entities.trash3.body;
-            const trashID = trash.id;
-            const trashCan = entities.trashCan.body;
-            const trashCanID = trashCan.id;
-            const floor = entities.floor.body;
-            const floorID = floor.id;
-            let engine = entities["physics"].engine;
-            let world = entities["physics"].world;
-            Matter.Events.on(engine, 'collisionStart', (event) => {
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == trashCanID || event.pairs[0].bodyB.id == trashCanID )
-                    {
-                        if(entities.trash3)
-                        {
-                            entities.floor.score = entities.floor.score + 1;
-                            dispatch('update_score');
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash3
-                    }
-                }
-                if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
-                {
-                    if(event.pairs[0].bodyA.id == floorID || event.pairs[0].bodyB.id == floorID )
-                    {
-                        if(entities.trash3)
-                        {
-                            entities.floor.life = entities.floor.life - 1;
-                        }
-                        Matter.Composite.remove(world, trash);
-                        delete entities.trash3
-                    }
-                }
-            });
-        }
-        else
-        {
-            
-                const {width, height} = Dimensions.get("screen");
-    
-                const boxSize = Math.trunc(Math.max(width, height) * 0.035);
-        
-                const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
-        
-                const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
-        
-                let world = entities["physics"].world;
-
-                let type = Math.floor(Math.random() * 3);
-        
-                Matter.World.add(world, [trash]);
-                entities['trash3'] = {
-                    body: trash,
-                    size: [boxSize, boxSize],
-                    trash: 'plastic',
-                    type: type,
-                    renderer: Trash
-                }
-
-        } 
     }
    
     return entities;

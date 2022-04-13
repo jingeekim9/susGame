@@ -1,15 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Animated, TouchableOpacity } from 'react-native';
+import * as Font from 'expo-font';
     
 export default class Start extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            fontLoaded: false
+        }
         this.opacity = new Animated.Value(0);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        await Font.loadAsync({
+            // Load a font `Montserrat` from a static resource
+            'GameFont': require('../assets/fonts/GameFont.otf'),
+          });
+        this.setState({fontLoaded: true})
         Animated.timing(this.opacity, {
             duration: 3000,
             toValue: 1,
@@ -24,9 +33,12 @@ export default class Start extends Component {
                     <Animated.View style={{
                         opacity: this.opacity
                     }}>
-                        <Text style={styles.startText}>
-                            Save the Earth
-                        </Text>
+                        {
+                            this.state.fontLoaded &&
+                            <Text style={[styles.startText, {fontFamily: 'GameFont'}]}>
+                                Save the Earth
+                            </Text>
+                        }
                     </Animated.View>
                     <TouchableOpacity
                         style={styles.pressArea}
@@ -47,10 +59,11 @@ const styles = StyleSheet.create({
     },
     startText: {
         color: 'white',
-        fontSize: 40,
+        fontSize: 60,
         textAlign: 'center',
         marginTop: 150,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        paddingBottom: 30
     },
     pressArea: {
         height: 250,
