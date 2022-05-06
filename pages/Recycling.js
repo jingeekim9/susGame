@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, ImageBackground, ActivityIndicator, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ImageBackground, ActivityIndicator, Pressable, TouchableOpacity, Image } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
 import Matter from "matter-js";
 import { Trash } from './Trash';
@@ -24,7 +24,7 @@ function FetchUserData({ gameRunning, onUpdate }) {
   return null;
 }
 
-const engine = Matter.Engine.create({ enableSleeping: false });
+const engine = Matter.Engine.create({ enableSleeping: false, gravity: {x: 0, y: 0.5} });
 
 const world = engine.world;
 
@@ -34,9 +34,11 @@ const boxSize = Math.trunc(Math.max(width, height) * 0.035);
 
 const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
 
-const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize, boxSize);
+const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize*1.5, boxSize*1.5);
 
-const trashCan = Matter.Bodies.rectangle(width / 2, height / 2 + 200, 50, 25, {isStatic: true});
+const canTrashCan = Matter.Bodies.rectangle((width / 2)-50, height / 2 + 200, 50, 25, {isStatic: true});
+
+const paperTrashCan = Matter.Bodies.rectangle((width / 2) + 50, height / 2 + 200, 50, 25, {isStatic: true});
 
 const floor = Matter.Bodies.rectangle(width / 2, height - boxSize / 2, width, boxSize*3, { isStatic: true });
 
@@ -49,7 +51,7 @@ const constraint = Matter.Constraint.create({
   angularStiffness: 1
 });
 
-Matter.World.add(world, [trash, trashCan, floor]);
+Matter.World.add(world, [trash, canTrashCan, paperTrashCan, floor]);
 
 export default class Recycling extends Component {
 
@@ -62,7 +64,9 @@ export default class Recycling extends Component {
       score: 0,
       question: [],
       level: 1,
-      preQuiz: this.props.route.params.preQuiz
+      preQuiz: this.props.route.params.preQuiz,
+      quizModalVisible: false,
+      pauseModalVisible: false
     }
   }
 
@@ -126,15 +130,21 @@ export default class Recycling extends Component {
           },
           trash: {
             body: trash,
-            size: [boxSize, boxSize],
+            size: [boxSize*1.5, boxSize*1.5],
             trash: 'can',
             type: 0,
             renderer: Trash
           },
-          trashCan: {
-            body: trashCan,
+          canTrashCan: {
+            body: canTrashCan,
             size: [50, 25],
             type: 'can',
+            renderer: TrashCan
+          },
+          paperTrashCan: {
+            body: paperTrashCan,
+            size: [50, 25],
+            type: 'paper',
             renderer: TrashCan
           },
           floor: {
@@ -161,7 +171,8 @@ export default class Recycling extends Component {
               break;
             case "next_level":
               this.setState({level: this.state.level + 1});
-              this.setState({gameRunning: false})
+              this.setState({gameRunning: false});
+              this.setState({quizModalVisible: true});
           }
         }}
       >
@@ -170,7 +181,19 @@ export default class Recycling extends Component {
           gameRunning={this.props.gameRunning}
           onUpdate={this._handleUpdate}
         />
-        <Modal isVisible={!this.state.gameRunning}>
+        <TouchableOpacity 
+          style={styles.pause_container}
+          onPress={() => {
+          this.setState({gameRunning: false});
+          this.setState({pauseModalVisible: true});
+          }}
+          >
+          <Image 
+            style={styles.pause_image}
+            source={require('../assets/pause.png')} 
+            />
+        </TouchableOpacity>
+        <Modal isVisible={this.state.quizModalVisible}>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <View style={{backgroundColor: 'white', paddingVertical: 20, paddingHorizontal: 10, borderRadius: 10}}>
               <Text style={styles.funFact}>Sustainability Fact</Text>
@@ -181,11 +204,28 @@ export default class Recycling extends Component {
                 <Text style={styles.questionText}>{this.state.question[this.state.level - 1]}</Text>
               }
                 <Pressable style={styles.button} onPress={() => {
+                  this.setState({quizModalVisible: false});
                   this.setState({gameRunning: true});
                 }}>
                     <Text style={{color: 'white', textAlign: 'center'}}>Play Next Level</Text>
                 </Pressable>
             </View>
+          </View>
+        </Modal>
+        <Modal isVisible={this.state.pauseModalVisible}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity 
+              onPress={() => {
+                this.setState({pauseModalVisible: false});
+                this.setState({gameRunning: true})
+              }}  
+            >
+              <View style={{backgroundColor: 'white', width: 200, height: 100, borderRadius: 10, justifyContent: 'center'}}>
+                <Text style={{textAlign: 'center', fontWeight: 'bold', fontSize: 30}}>
+                  Play
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </Modal>
       </GameEngine>
@@ -227,5 +267,14 @@ const styles = StyleSheet.create({
       paddingRight: 30,
       fontSize: 20,
       fontWeight: '700',
+  },
+  pause_image: {
+    width: 30,
+    height: 30
+  },
+  pause_container: {
+    position: 'absolute',
+    top: 30,
+    right: 30
   },
 });
