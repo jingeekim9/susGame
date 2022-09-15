@@ -11,6 +11,7 @@ import { TrashCan } from './TrashCan';
 import { useFocusEffect } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import axios from 'axios';
+import { Audio } from 'expo-av';
 
 function FetchUserData({ gameRunning, onUpdate }) {
   useFocusEffect(
@@ -66,8 +67,45 @@ export default class Recycling extends Component {
       level: 1,
       preQuiz: this.props.route.params.preQuiz,
       quizModalVisible: false,
-      pauseModalVisible: false
+      pauseModalVisible: false,
+      goodSound: null,
+      badSound: null,
+      gameOverSound: null,
+      nextLevelSound: null
     }
+  }
+
+
+  async playGoodSound() {
+    const { sound } = await Audio.Sound.createAsync(
+        require('../assets/sounds/good.wav')
+    );
+    this.setState({goodSound: sound});
+    await sound.playAsync();
+  }
+
+  async playBadSound() {
+    const { sound } = await Audio.Sound.createAsync(
+        require('../assets/sounds/bad.mp3')
+    );
+    this.setState({badSound: sound});
+    await sound.playAsync();
+  }
+
+  async playGameOverSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/game_over.mp3')
+    );
+    this.setState({gameOverSound: sound});
+    await sound.playAsync();
+  }
+
+  async playNextLevelSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/game_over.mp3')
+    );
+    this.setState({nextLevelSound: sound});
+    await sound.playAsync();
   }
 
   componentDidMount() {
@@ -92,6 +130,17 @@ export default class Recycling extends Component {
             this.setState({question: questions})
         }
     })
+  }
+
+  componentWillUnmount() {
+    if(this.state.goodSound)
+    {
+      this.state.goodSound.unloadAsync();
+    }
+    if(this.state.badSound)
+    {
+      this.state.badSound.unloadAsync();
+    }
   }
 
   _handleUpdate = gameRunning => {
@@ -159,7 +208,11 @@ export default class Recycling extends Component {
         running={this.state.gameRunning}
         onEvent={(e) => {
           switch (e) {
+            case "lose_life":
+              this.playBadSound();
+              break;
             case "game-over":
+              this.playGameOverSound();
               this.setState({gameRunning: false})
               this.props.navigation.navigate("GameOver", {score: this.state.score, preQuiz: this.state.preQuiz});
               this.setState({score: 0});
@@ -167,9 +220,11 @@ export default class Recycling extends Component {
               break;
             
             case "update_score":
+              this.playGoodSound();
               this.setState({score: this.state.score + 1});
               break;
             case "next_level":
+              this.playNextLevelSound();
               this.setState({level: this.state.level + 1});
               this.setState({gameRunning: false});
               this.setState({quizModalVisible: true});
@@ -222,7 +277,7 @@ export default class Recycling extends Component {
             >
               <View style={{backgroundColor: 'white', width: 200, height: 100, borderRadius: 10, justifyContent: 'center'}}>
                 <Text style={{textAlign: 'center', fontWeight: 'bold', fontSize: 30}}>
-                  Play
+                  Resume
                 </Text>
               </View>
             </TouchableOpacity>

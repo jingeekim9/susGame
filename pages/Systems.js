@@ -167,6 +167,7 @@ const deleteTrash = (entities, { time, dispatch }) => {
                         else
                         {
                             entities.floor.life = entities.floor.life - 1;
+                            dispatch('lose_life');
                         }
                         
                         Matter.Composite.remove(world, trash);
@@ -186,6 +187,7 @@ const deleteTrash = (entities, { time, dispatch }) => {
                         else
                         {
                             entities.floor.life = entities.floor.life - 1;
+                            dispatch('lose_life');
                         }
                         
                         Matter.Composite.remove(world, trash);
@@ -200,6 +202,7 @@ const deleteTrash = (entities, { time, dispatch }) => {
                     if(entities.trash)
                     {
                         entities.floor.life = entities.floor.life - 1;
+                        dispatch('lose_life');
                         
                         Matter.Composite.remove(world, trash);
                         delete entities.trash

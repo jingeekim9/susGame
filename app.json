@@ -3,9 +3,18 @@
     "name": "sus_game",
     "slug": "sus_game",
     "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo/logo.png",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "org.reactjs.native.susGame"
+    },
+    "android": {
+      "package": "org.reactjs.native.susGame",
+      "permissions": []
+    }
   },
   "name": "sus_game"
 }

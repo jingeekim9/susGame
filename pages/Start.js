@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, Animated, TouchableOpacity } from 'react-native';
 import * as Font from 'expo-font';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
     
 export default class Start extends Component {
 
@@ -44,6 +45,11 @@ export default class Start extends Component {
                         style={styles.pressArea}
                         onPress={() => this.props.navigation.navigate('Home')}
                     />
+                    <View style={{position: 'absolute', bottom: hp(5), justifyContent: 'center', width: '100%'}}>
+                        <Text style={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>
+                            Designed by Taehoon Lee
+                        </Text>
+                    </View>
                 </ImageBackground>
             </View>
         )
@@ -59,7 +65,7 @@ const styles = StyleSheet.create({
     },
     startText: {
         color: 'white',
-        fontSize: 60,
+        fontSize: hp(5),
         textAlign: 'center',
         marginTop: 150,
         fontWeight: 'bold',

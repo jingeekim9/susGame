@@ -19,6 +19,7 @@ export default class Quiz extends Component {
             option3: [],
             option4: [],
             answer: [],
+            type: [],
             right1: false,
             right2: false,
             right3: false,
@@ -32,12 +33,14 @@ export default class Quiz extends Component {
             curQuestion: 0,
             showModal: false,
             canPress: true,
-            preQuiz: this.props.route.params.preQuiz
+            preQuiz: this.props.route.params.preQuiz,
+            isLoading: false
         }
     }
 
     componentDidMount() {
         this._isMounted = true;
+        this.setState({isLoading: true});
         axios.get('https://sus-game.herokuapp.com?type=2')
         .then((response) => {
             let data = response.data;
@@ -48,6 +51,7 @@ export default class Quiz extends Component {
             let option3 = [];
             let option4 = [];
             let answer = [];
+            let type = [];
             while(questions.length < 5)
             {
                 let random = Math.floor(Math.random() * Object.keys(data['Answer']).length);
@@ -59,6 +63,7 @@ export default class Quiz extends Component {
                     option3.push(data['Option3'][String(random)]);
                     option4.push(data['Option4'][String(random)]);
                     answer.push(data['Answer'][String(random)]);
+                    type.push(data['Type'][String(random)]);
                     arr.push(random);
                 } 
             }
@@ -70,7 +75,9 @@ export default class Quiz extends Component {
                 this.setState({option3: option3});
                 this.setState({option4: option4});
                 this.setState({answer: answer});
+                this.setState({type: type});
             }
+            this.setState({isLoading: false});
         })
     }
 
@@ -78,9 +85,10 @@ export default class Quiz extends Component {
         this._isMounted = false;
     }
 
-    answerQuestion(option) {
+    answerQuestion(option, type) {
         this.setState({quesNum: this.state.quesNum + 1});
         this.setState({canPress: false});
+
         if(option == this.state.answer[this.state.curQuestion])
         {
             Toast.show({
@@ -91,21 +99,35 @@ export default class Quiz extends Component {
 
             this.setState({right: this.state.right + 1});
 
-            if(option == 1)
+            if(type == "T/F")
             {
-                this.setState({right1: true});
-            }
-            else if(option == 2)
+                if(option == "T")
+                {
+                    this.setState({right1: true});
+                }
+                else
+                {
+                    this.setState({right2: true});
+                }
+            }  
+            else
             {
-                this.setState({right2: true});
-            }
-            else if(option == 3)
-            {
-                this.setState({right3: true});
-            }
-            else if(option == 4)
-            {
-                this.setState({right4: true});
+                if(option == 1)
+                {
+                    this.setState({right1: true});
+                }
+                else if(option == 2)
+                {
+                    this.setState({right2: true});
+                }
+                else if(option == 3)
+                {
+                    this.setState({right3: true});
+                }
+                else if(option == 4)
+                {
+                    this.setState({right4: true});
+                }
             }
         }
         else
@@ -115,21 +137,36 @@ export default class Quiz extends Component {
                 text1: 'Wrong!',
                 visibilityTime: 2000
             });
-            if(option == 1)
+
+            if(type == "T/F")
             {
-                this.setState({wrong1: true});
-            }
-            else if(option == 2)
+                if(option == "T")
+                {
+                    this.setState({wrong1: true});
+                }
+                else
+                {
+                    this.setState({wrong2: true});
+                }
+            }  
+            else
             {
-                this.setState({wrong2: true});
-            }
-            else if(option == 3)
-            {
-                this.setState({wrong3: true});
-            }
-            else if(option == 4)
-            {
-                this.setState({wrong4: true});
+                if(option == 1)
+                {
+                    this.setState({wrong1: true});
+                }
+                else if(option == 2)
+                {
+                    this.setState({wrong2: true});
+                }
+                else if(option == 3)
+                {
+                    this.setState({wrong3: true});
+                }
+                else if(option == 4)
+                {
+                    this.setState({wrong4: true});
+                }
             }
         }
         if(this.state.curQuestion == 4)
@@ -167,23 +204,37 @@ export default class Quiz extends Component {
                             Quiz
                         </Text>
                     </View>
-                    {this.state.question === "" ?
+                    {this.state.isLoading ?
                         <ActivityIndicator style={{marginTop: 300}} size="large" />
                         :
                         <View style={styles.info_container}>
                             <Text style={styles.funFact}>{this.state.question[this.state.curQuestion]}</Text>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right1 ? "#5E5DF0" : this.state.wrong1 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(1);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option1[this.state.curQuestion]}</Text>
-                            </Pressable>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right2 ? "#5E5DF0" : this.state.wrong2 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(2);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option2[this.state.curQuestion]}</Text>
-                            </Pressable>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right3 ? "#5E5DF0" : this.state.wrong3 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(3);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option3[this.state.curQuestion]}</Text>
-                            </Pressable>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right4 ? "#5E5DF0" : this.state.wrong4 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(4);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option4[this.state.curQuestion]}</Text>
-                            </Pressable>
+                            {
+                                this.state.type[this.state.curQuestion] == "T/F" ?
+                                <View>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right1 ? "#5E5DF0" : this.state.wrong1 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion('T', this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>True</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right2 ? "#5E5DF0" : this.state.wrong2 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion('F', this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>False</Text>
+                                    </Pressable>
+                                </View>
+                                :
+                                <View>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right1 ? "#5E5DF0" : this.state.wrong1 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(1, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option1[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right2 ? "#5E5DF0" : this.state.wrong2 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(2, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option2[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right3 ? "#5E5DF0" : this.state.wrong3 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(3, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option3[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right4 ? "#5E5DF0" : this.state.wrong4 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(4, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option4[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                </View>
+                            }
                             <View>
                                 {
                                     this.state.curQuestion < 4 &&

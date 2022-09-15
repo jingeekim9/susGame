@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, Button, Animated, Pressable, ActivityIndicator, ImageBackground } from 'react-native';
 import Toast from "react-native-toast-message";
 import Modal from 'react-native-modal';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
     
 export default class PreQuiz extends Component {
 
@@ -19,6 +20,7 @@ export default class PreQuiz extends Component {
             option3: [],
             option4: [],
             answer: [],
+            type: [],
             right1: false,
             right2: false,
             right3: false,
@@ -31,12 +33,14 @@ export default class PreQuiz extends Component {
             quesNum: 0,
             curQuestion: 0,
             showModal: false,
-            canPress: true
+            canPress: true,
+            isLoading: false
         }
     }
 
     componentDidMount() {
         this._isMounted = true;
+        this.setState({isLoading: true});
         axios.get('https://sus-game.herokuapp.com?type=2')
         .then((response) => {
             let data = response.data;
@@ -47,6 +51,7 @@ export default class PreQuiz extends Component {
             let option3 = [];
             let option4 = [];
             let answer = [];
+            let type = [];
             while(questions.length < 5)
             {
                 let random = Math.floor(Math.random() * Object.keys(data['Answer']).length);
@@ -58,6 +63,7 @@ export default class PreQuiz extends Component {
                     option3.push(data['Option3'][String(random)]);
                     option4.push(data['Option4'][String(random)]);
                     answer.push(data['Answer'][String(random)]);
+                    type.push(data['Type'][String(random)]);
                     arr.push(random);
                 } 
             }
@@ -69,7 +75,9 @@ export default class PreQuiz extends Component {
                 this.setState({option3: option3});
                 this.setState({option4: option4});
                 this.setState({answer: answer});
+                this.setState({type: type});
             }
+            this.setState({isLoading: false});
         })
     }
 
@@ -77,9 +85,10 @@ export default class PreQuiz extends Component {
         this._isMounted = false;
     }
 
-    answerQuestion(option) {
+    answerQuestion(option, type) {
         this.setState({quesNum: this.state.quesNum + 1});
         this.setState({canPress: false});
+        console.log(this.state.answer[this.state.curQuestion])
         if(option == this.state.answer[this.state.curQuestion])
         {
             Toast.show({
@@ -90,21 +99,35 @@ export default class PreQuiz extends Component {
 
             this.setState({right: this.state.right + 1});
 
-            if(option == 1)
+            if(type == "T/F")
             {
-                this.setState({right1: true});
-            }
-            else if(option == 2)
+                if(option == "T")
+                {
+                    this.setState({right1: true});
+                }
+                else
+                {
+                    this.setState({right2: true});
+                }
+            }  
+            else
             {
-                this.setState({right2: true});
-            }
-            else if(option == 3)
-            {
-                this.setState({right3: true});
-            }
-            else if(option == 4)
-            {
-                this.setState({right4: true});
+                if(option == 1)
+                {
+                    this.setState({right1: true});
+                }
+                else if(option == 2)
+                {
+                    this.setState({right2: true});
+                }
+                else if(option == 3)
+                {
+                    this.setState({right3: true});
+                }
+                else if(option == 4)
+                {
+                    this.setState({right4: true});
+                }
             }
         }
         else
@@ -114,21 +137,36 @@ export default class PreQuiz extends Component {
                 text1: 'Wrong!',
                 visibilityTime: 2000
             });
-            if(option == 1)
+
+            if(type == "T/F")
             {
-                this.setState({wrong1: true});
-            }
-            else if(option == 2)
+                if(option == "T")
+                {
+                    this.setState({wrong1: true});
+                }
+                else
+                {
+                    this.setState({wrong2: true});
+                }
+            }  
+            else
             {
-                this.setState({wrong2: true});
-            }
-            else if(option == 3)
-            {
-                this.setState({wrong3: true});
-            }
-            else if(option == 4)
-            {
-                this.setState({wrong4: true});
+                if(option == 1)
+                {
+                    this.setState({wrong1: true});
+                }
+                else if(option == 2)
+                {
+                    this.setState({wrong2: true});
+                }
+                else if(option == 3)
+                {
+                    this.setState({wrong3: true});
+                }
+                else if(option == 4)
+                {
+                    this.setState({wrong4: true});
+                }
             }
         }
         if(this.state.curQuestion == 4)
@@ -166,23 +204,38 @@ export default class PreQuiz extends Component {
                             Quiz
                         </Text>
                     </View>
-                    {this.state.question === "" ?
-                        <ActivityIndicator style={{marginTop: 300}} size="large" />
+                    {this.state.isLoading ?
+                        <ActivityIndicator style={{textAlign: 'center', marginTop: hp(30)}} size="large" color="#0000ff"/>
                         :
                         <View style={styles.info_container}>
                             <Text style={styles.funFact}>{this.state.question[this.state.curQuestion]}</Text>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right1 ? "#5E5DF0" : this.state.wrong1 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(1);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option1[this.state.curQuestion]}</Text>
-                            </Pressable>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right2 ? "#5E5DF0" : this.state.wrong2 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(2);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option2[this.state.curQuestion]}</Text>
-                            </Pressable>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right3 ? "#5E5DF0" : this.state.wrong3 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(3);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option3[this.state.curQuestion]}</Text>
-                            </Pressable>
-                            <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right4 ? "#5E5DF0" : this.state.wrong4 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(4);}}>
-                                <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option4[this.state.curQuestion]}</Text>
-                            </Pressable>
+                            {
+                                this.state.type[this.state.curQuestion] == "T/F" ?
+                                <View>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right1 ? "#5E5DF0" : this.state.wrong1 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion('T', this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>True</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right2 ? "#5E5DF0" : this.state.wrong2 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion('F', this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>False</Text>
+                                    </Pressable>
+                                </View>
+                                :
+                                <View>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right1 ? "#5E5DF0" : this.state.wrong1 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(1, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option1[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right2 ? "#5E5DF0" : this.state.wrong2 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(2, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option2[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right3 ? "#5E5DF0" : this.state.wrong3 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(3, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option3[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                    <Pressable disabled={!this.state.canPress} style={[styles.button, {backgroundColor: this.state.right4 ? "#5E5DF0" : this.state.wrong4 ? '#F24A72' : "#565962"}]} onPress={() => {this.answerQuestion(4, this.state.type[this.state.curQuestion]);}}>
+                                        <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 20}}>{this.state.option4[this.state.curQuestion]}</Text>
+                                    </Pressable>
+                                </View>
+                            }
+
                             <View>
                                 {
                                     this.state.curQuestion < 4 &&
@@ -233,7 +286,7 @@ const styles = StyleSheet.create({
     button: {
         width: '90%',
         backgroundColor: "#565962",
-        padding: 20,
+        padding: hp(2),
         color: '#445463',
         marginLeft: 'auto',
         marginRight: 'auto',
@@ -241,9 +294,9 @@ const styles = StyleSheet.create({
         borderRadius: 20
     },
     nextQuestion: {
-        width: 200,
+        width: hp(30),
         backgroundColor: "#5E5DF0",
-        padding: 20,
+        padding: hp(2),
         color: '#445463',
         marginLeft: 'auto',
         marginRight: 'auto',
@@ -274,9 +327,9 @@ const styles = StyleSheet.create({
     },
     funFact: {
         textAlign: 'center',
-        fontSize: 30,
+        fontSize: hp(3),
         marginBottom: 30,
-        fontWeight: '800',
+        fontWeight: 'bold',
         color: '#019267'
     },
     curScore: {
