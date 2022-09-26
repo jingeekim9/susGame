@@ -6,7 +6,8 @@ import { TrashCan } from "./TrashCan";
 var curMoving = "";
 
 const distance = ([x1, y1], [x2, y2]) => {
-    return Math.sqrt(Math.abs(Math.pow(x2 - x1, 2)+ Math.pow(y2 - y1, 2)))
+    // return Math.sqrt(Math.abs(Math.pow(x2 - x1, 2)+ Math.pow(y2 - y1, 2)))
+    return Math.abs(x1 - x2)
 }
 
 const Physics = (entities, { time, dispatch }) => {
@@ -40,7 +41,7 @@ const Physics = (entities, { time, dispatch }) => {
     else if(level == 4 && score == 55)
     {
         entities.floor.level = 5;
-        engine.world.gravity.y = 1;
+        engine.world.gravity.y = 0.1;
         dispatch('next_level');
 
         if(!entities.plasticTrashCan)
@@ -51,7 +52,7 @@ const Physics = (entities, { time, dispatch }) => {
 
             Matter.World.add(world, [plasticTrashCan]);
                 entities['plasticTrashCan'] = {
-                    body: canTrashCan,
+                    body: plasticTrashCan,
                     size: [50, 25],
                     type: 'plastic',
                     renderer: TrashCan
@@ -85,6 +86,11 @@ const Physics = (entities, { time, dispatch }) => {
             Matter.Composite.remove(world, entities.trash3.body);
             delete entities.trash3;
         }
+        if(entities.plasticTrashCan)
+        {
+            Matter.Composite.remove(world, entities.plasticTrashCan.body);
+            delete entities.plasticTrashCan;
+        }
         dispatch("game-over")
     }
 
@@ -92,47 +98,103 @@ const Physics = (entities, { time, dispatch }) => {
 }
 
 const MoveTrashCan = (entities, { touches }) => {
-    
-    const {width, height} = Dimensions.get("screen");
-    const boxSize = Math.trunc(Math.max(width, height) * 0.035);
 
-    let start = touches.find(x => x.type == "start");
-
-    
-    let t = touches.find(x => x.type === "move");
     let canTrashCan = entities.canTrashCan;
     let paperTrashCan = entities.paperTrashCan;
-    const canX = canTrashCan.body.position.x;
-    const canY = canTrashCan.body.position.y;
-    const paperX = paperTrashCan.body.position.x;
-    const paperY = paperTrashCan.body.position.y;
-    if(start)
+    let plasticTrashCan = entities.plasticTrashCan;
+    if(plasticTrashCan)
     {
-        let startX = start.event.locationX;
-        let startY = start.event.locationY;
 
-        let canDistance = distance([canX, canY], [startX, startY]);
-        let paperDistance = distance([paperX, paperY], [startX, startY]);
+        let start = touches.find(x => x.type == "start");
+    
+        let t = touches.find(x => x.type === "move");
 
-        if(canDistance < paperDistance)
+        const canX = canTrashCan.body.position.x;
+        const canY = canTrashCan.body.position.y;
+        const paperX = paperTrashCan.body.position.x;
+        const paperY = paperTrashCan.body.position.y;
+        const plasticX = plasticTrashCan.body.position.x;
+        const plasticY = plasticTrashCan.body.position.y;
+
+        if(start)
         {
-            curMoving = "can";
+            let startX = start.event.pageX;
+            let startY = start.event.pageY;
+    
+            let canDistance = distance([canX, canY], [startX, startY]);
+            let paperDistance = distance([paperX, paperY], [startX, startY]);
+            let plasticDistance = distance([plasticX, plasticY], [startX, startY]);
+    
+            if(canDistance < paperDistance && canDistance < plasticDistance)
+            {
+                curMoving = "can";
+            }
+            else if(paperDistance < canDistance && paperDistance < plasticDistance)
+            {
+                curMoving = "paper";
+            }
+            else if(plasticDistance < canDistance && plasticDistance < paperDistance)
+            {
+                curMoving = "plastic";
+            }
         }
-        else
-        {
-            curMoving = "paper";
+        if(t && canTrashCan && paperTrashCan && plasticTrashCan)
+        {        
+            
+            if(curMoving == "can")
+            {
+                Matter.Body.set(canTrashCan.body, "position", {x: canX + t.delta.pageX, y: canY});
+            }
+            else if(curMoving == "paper")
+            {
+                Matter.Body.set(paperTrashCan.body, "position", {x: paperX + t.delta.pageX, y: paperY});
+            }
+            else if(curMoving == "plastic")
+            {
+                Matter.Body.set(plasticTrashCan.body, "position", {x: plasticX + t.delta.pageX, y: plasticY});
+            }
         }
     }
-    if(t && canTrashCan && paperTrashCan)
-    {        
-        
-        if(curMoving == "can")
+    else
+    {
+
+        let start = touches.find(x => x.type == "start");
+    
+        let t = touches.find(x => x.type === "move");
+
+        const canX = canTrashCan.body.position.x;
+        const canY = canTrashCan.body.position.y;
+        const paperX = paperTrashCan.body.position.x;
+        const paperY = paperTrashCan.body.position.y;
+
+        if(start)
         {
-            Matter.Body.set(canTrashCan.body, "position", {x: canX + t.delta.pageX, y: canY});
+            let startX = start.event.pageX;
+            let startY = start.event.pageY;
+    
+            let canDistance = distance([canX, canY], [startX, startY]);
+            let paperDistance = distance([paperX, paperY], [startX, startY]);
+    
+            if(canDistance < paperDistance)
+            {
+                curMoving = "can";
+            }
+            else
+            {
+                curMoving = "paper";
+            }
         }
-        else if(curMoving == "paper")
-        {
-            Matter.Body.set(paperTrashCan.body, "position", {x: paperX + t.delta.pageX, y: paperY});
+        if(t && canTrashCan && paperTrashCan)
+        {        
+            
+            if(curMoving == "can")
+            {
+                Matter.Body.set(canTrashCan.body, "position", {x: canX + t.delta.pageX, y: canY});
+            }
+            else if(curMoving == "paper")
+            {
+                Matter.Body.set(paperTrashCan.body, "position", {x: paperX + t.delta.pageX, y: paperY});
+            }
         }
     }
 
@@ -148,6 +210,8 @@ const deleteTrash = (entities, { time, dispatch }) => {
         const canTrashCanID = canTrashCan.id;
         const paperTrashCan = entities.paperTrashCan.body;
         const paperTrashCanID = paperTrashCan.id;
+        const plasticTrashCan = entities.plasticTrashCan ? entities.plasticTrashCan.body : null;
+        const plasticTrashCanID = plasticTrashCan ? plasticTrashCan.id : null;
         const floor = entities.floor.body;
         const floorID = floor.id;
         let engine = entities["physics"].engine;
@@ -194,6 +258,30 @@ const deleteTrash = (entities, { time, dispatch }) => {
                         delete entities.trash
                     }
                 }
+
+                if(plasticTrashCanID)
+                {
+                    if(event.pairs[0].bodyA.id == plasticTrashCanID || event.pairs[0].bodyB.id == plasticTrashCanID )
+                    {
+                        if(entities.trash)
+                        {
+                            if(entities.trash.trash == 'plastic')
+                            {
+                                entities.floor.score = entities.floor.score + 1;
+                                dispatch('update_score');
+                            }
+                            else
+                            {
+                                entities.floor.life = entities.floor.life - 1;
+                                dispatch('lose_life');
+                            }
+                            
+                            Matter.Composite.remove(world, trash);
+                            delete entities.trash
+                        }
+                    }
+                }
+
             }
             if(event.pairs[0].bodyA.id == trashID || event.pairs[0].bodyB.id == trashID)
             {
@@ -221,7 +309,7 @@ const deleteTrash = (entities, { time, dispatch }) => {
 
         const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
 
-        const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize*1.5, boxSize*1.5);
+        const trash = Matter.Bodies.rectangle(randomPosition, -50, boxSize*1.5, boxSize*1.5);
 
         let world = entities["physics"].world;
 

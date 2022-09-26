@@ -35,7 +35,7 @@ const boxSize = Math.trunc(Math.max(width, height) * 0.035);
 
 const randomPosition = Math.floor(Math.random() * (width - 10 - 10)) + 10;
 
-const trash = Matter.Bodies.rectangle(randomPosition, 0, boxSize*1.5, boxSize*1.5);
+const trash = Matter.Bodies.rectangle(randomPosition, -50, boxSize*1.5, boxSize*1.5);
 
 const canTrashCan = Matter.Bodies.rectangle((width / 2)-50, height / 2 + 200, 50, 25, {isStatic: true});
 
@@ -115,7 +115,7 @@ export default class Recycling extends Component {
         let data = response.data;
         let arr = [];
         let questions = [];
-        while(questions.length < 5)
+        while(questions.length < 10)
         {
           let random = Math.floor(Math.random() * Object.keys(data['Questions']).length);
           if(arr.indexOf(random) === -1)
@@ -150,7 +150,7 @@ export default class Recycling extends Component {
         let data = response.data;
         let arr = [];
         let questions = [];
-        while(questions.length < 5)
+        while(questions.length < 10)
         {
           let random = Math.floor(Math.random() * Object.keys(data['Questions']).length);
           if(arr.indexOf(random) === -1)

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "sus_game",
-    "slug": "sus_game",
+    "name": "KleanTrash",
+    "slug": "KleanTrash",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo/logo.png",
@@ -16,5 +16,5 @@
       "permissions": []
     }
   },
-  "name": "sus_game"
+  "name": "KleanTrash"
 }

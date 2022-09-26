@@ -34,7 +34,8 @@ export default class Quiz extends Component {
             showModal: false,
             canPress: true,
             preQuiz: this.props.route.params.preQuiz,
-            isLoading: false
+            isLoading: false,
+            canPressNext: false
         }
     }
 
@@ -52,7 +53,7 @@ export default class Quiz extends Component {
             let option4 = [];
             let answer = [];
             let type = [];
-            while(questions.length < 5)
+            while(questions.length < 10)
             {
                 let random = Math.floor(Math.random() * Object.keys(data['Answer']).length);
                 if(arr.indexOf(random) === -1)
@@ -88,7 +89,7 @@ export default class Quiz extends Component {
     answerQuestion(option, type) {
         this.setState({quesNum: this.state.quesNum + 1});
         this.setState({canPress: false});
-
+        this.setState({canPressNext: true});
         if(option == this.state.answer[this.state.curQuestion])
         {
             Toast.show({
@@ -169,23 +170,35 @@ export default class Quiz extends Component {
                 }
             }
         }
-        if(this.state.curQuestion == 4)
+        if(this.state.curQuestion == 9)
         {
             this.setState({showModal: true})
         }
     }
 
     next() {
-        this.setState({curQuestion: this.state.curQuestion + 1});
-        this.setState({right1: false});
-        this.setState({right2: false});
-        this.setState({right3: false});
-        this.setState({right4: false});
-        this.setState({wrong1: false});
-        this.setState({wrong2: false});
-        this.setState({wrong3: false});
-        this.setState({wrong4: false});
-        this.setState({canPress: true});
+        if(this.state.canPressNext == false)
+        {
+            Toast.show({
+                type: 'error',
+                text1: 'Please answer the question.',
+                visibilityTime: 2000
+            });
+        }
+        else
+        {
+            this.setState({curQuestion: this.state.curQuestion + 1});
+            this.setState({right1: false});
+            this.setState({right2: false});
+            this.setState({right3: false});
+            this.setState({right4: false});
+            this.setState({wrong1: false});
+            this.setState({wrong2: false});
+            this.setState({wrong3: false});
+            this.setState({wrong4: false});
+            this.setState({canPress: true});
+            this.setState({canPressNext: false});
+        }
     }
 
     render() {
@@ -237,7 +250,7 @@ export default class Quiz extends Component {
                             }
                             <View>
                                 {
-                                    this.state.curQuestion < 4 &&
+                                    this.state.curQuestion < 9 &&
                                     <Pressable style={styles.nextQuestion} onPress={() => {
                                         this.next();
                                         }}>
